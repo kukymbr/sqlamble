@@ -1,3 +1,3 @@
 package sql
 
-//go:generate go tool sqlamble --package=queries --target=internal/queries
+//go:generate go run github.com/kukymbr/sqlamble/cmd/sqlamble --package=queries --target=../internal/queries
