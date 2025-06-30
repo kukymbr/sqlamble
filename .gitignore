@@ -1,2 +1,5 @@
 # Binaries
-/sqlable
+/bin/*
+
+# Coverage
+/coverage*

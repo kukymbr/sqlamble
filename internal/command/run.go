@@ -14,7 +14,7 @@ import (
 
 func Run() {
 	if err := run(); err != nil {
-		utils.PrintErrorf(err.Error())
+		utils.PrintErrorf("%s", err.Error())
 		os.Exit(1)
 	}
 

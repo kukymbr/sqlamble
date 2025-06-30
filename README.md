@@ -1,6 +1,6 @@
-# sqlamble
+# 🍳 sqlamble
 
-The `sqlamble` tool allows you to embed your SQL queries into the Golang code in structural way.
+The `sqlamble` tool allows you to embed your SQL queries into the Golang code in structural read-only way.
 
 ## Why?
 
@@ -28,11 +28,11 @@ sql
 └── ... other 100500 directories
 ```
 
-The `sqlamble` takes all these files on the build stage and converts them into the structured set 
+The `sqlamble` takes all these files on the `go generate` stage and converts them into the structured set 
 of the read-only strings. For example:
 
 ```go
-query := queries.Users().GetList()
+query := queries.Queries().Users().GetList()
 ```
 
 ## Installation
@@ -67,7 +67,7 @@ Flags:
    ```go
     package sql  
 
-   //go:generate go tool sqlamble --package=queries --target=internal/queries
+   //go:generate go tool sqlamble --package=queries --target=../internal/queries
    ```
 3. Run the `go generate` command:
    ```shell
@@ -89,3 +89,11 @@ Flags:
    ```
 
 See the [example](example) directory for a full example.
+
+## Contributing
+
+Please, refer the [CONTRIBUTING.md](CONTRIBUTING.md) doc.
+
+## License
+
+[MIT](LICENSE).

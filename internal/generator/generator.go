@@ -55,6 +55,7 @@ func (g *Generator) Generate(ctx context.Context) error {
 	return nil
 }
 
+//nolint:funlen
 func (g *Generator) scanDir(
 	ctx context.Context,
 	rootPath string,

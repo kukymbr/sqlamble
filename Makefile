@@ -17,7 +17,6 @@ all:
 prepare:
 	go install ./...
 	go fmt ./...
-	$(MAKE) generate
 
 validate:
 	go vet ./...
@@ -25,12 +24,7 @@ validate:
 	$(MAKE) test
 
 build:
-	go build $(GO_BUILD_ARGS) -o bin/cleemebackend ./cmd/backend
-
-generate:
-	go generate ./...
-	go mod tidy
-
+	go build $(GO_BUILD_ARGS) -o bin/sqlamble ./cmd/sqlamble
 
 lint:
 	if [ ! -f ./bin/golangci-lint ]; then \
@@ -39,13 +33,13 @@ lint:
 	./bin/golangci-lint run ./...
 
 test:
-	CGO_ENABLED=1 go test -race -coverprofile=coverage_out ./...
+	go test -coverprofile=coverage_out ./...
 	go tool cover -func=coverage_out
 	go tool cover -html=coverage_out -o coverage.html
 	rm -f coverage_out
 
 test_report:
-	CGO_ENABLED=1 go test -race -coverprofile=coverage_out -v 2>&1 ./... | go-junit-report -set-exit-code -iocopy -out junit.report.xml
+	go test -coverprofile=coverage_out -v 2>&1 ./... | go-junit-report -set-exit-code -iocopy -out junit.report.xml
 	go tool cover -func=coverage_out
 	go tool cover -html=coverage_out -o coverage.html
 
@@ -54,3 +48,6 @@ test_short:
 
 clean:
 	go clean
+
+generate_example:
+	go generate ./example/sql

@@ -1,0 +1,54 @@
+version: "2"
+run:
+  go: "1.24"
+  tests: false
+  allow-parallel-runners: true
+linters:
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - containedctx
+    - cyclop
+    - dupl
+    - errchkjson
+    - errname
+    - errorlint
+    - funlen
+    - gocheckcompilerdirectives
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - gosec
+    - importas
+    - lll
+    - misspell
+    - nilerr
+    - nlreturn
+    - nolintlint
+    - prealloc
+    - predeclared
+    - reassign
+    - rowserrcheck
+    - sqlclosecheck
+    - testpackage
+    - unconvert
+    - unparam
+    - wastedassign
+    - whitespace
+    - wsl
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - example$
+formatters:
+  exclusions:
+    generated: lax
+    paths:
+      - example$
