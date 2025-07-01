@@ -1,5 +1,7 @@
 # 🍳 sqlamble
 
+> For those who hate SQL inside the Go code.
+
 The `sqlamble` tool allows you to embed your SQL queries into the Golang code in structural read-only way.
 
 ## Why?
