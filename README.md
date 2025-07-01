@@ -75,7 +75,7 @@ Flags:
    ```shell
    go generate ./sql
    ```
-4. Use the types, generated into the `queries` package inside the `internal/queries` (names are from the example):
+4. Use the types, generated into the `queries` package (see the generated `internal/queries/` directory):
    ```go
    package users
    
