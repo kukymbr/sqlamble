@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/kukymbr/sqlamble/internal/formatter"
 	"github.com/kukymbr/sqlamble/internal/generator"
 	"github.com/kukymbr/sqlamble/internal/utils"
 	"github.com/kukymbr/sqlamble/internal/version"
@@ -38,7 +39,10 @@ See https://github.com/kukymbr/sqlamble for info.`,
 				return err
 			}
 
-			gen := generator.New(opt)
+			gen, err := generator.New(opt)
+			if err != nil {
+				return err
+			}
 
 			utils.PrintHellof("Hi, this is sqlamble generator.")
 			utils.PrintDebugf("Options: " + opt.Debug())
@@ -87,6 +91,13 @@ func initFlags(cmd *cobra.Command, opt *generator.Options, silent *bool) {
 		[]string{generator.DefaultSourceFilesExtension},
 		"If set, source files will be filtered by these suffixes in names",
 	)
+
+	cmd.Flags().StringVar(
+		&opt.Formatter,
+		"fmt",
+		formatter.DefaultFormatter,
+		"Formatter used to format generated go files (gofmt|noop)",
+	)
 }
 
 func prepareOptions(opt *generator.Options) error {
@@ -100,6 +111,10 @@ func prepareOptions(opt *generator.Options) error {
 
 	if opt.TargetDir == "" {
 		opt.TargetDir = generator.DefaultTargetDir
+	}
+
+	if opt.Formatter == "" {
+		opt.Formatter = formatter.DefaultFormatter
 	}
 
 	if err := utils.ValidateIsDir(opt.SourceDir); err != nil {

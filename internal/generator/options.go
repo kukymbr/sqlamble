@@ -25,6 +25,10 @@ type Options struct {
 	// SourceFilesExt is a list of source files extensions (or suffixes).
 	// If defined, files not matching any of these suffixes, will be ignored.
 	SourceFilesExt []string
+
+	// Formatter is a name of the formatter for the generated code files.
+	// Available options: gofmt (default), none.
+	Formatter string
 }
 
 func (opt Options) Debug() string {
@@ -32,10 +36,12 @@ func (opt Options) Debug() string {
 		"package=%s; "+
 			"source=%s; "+
 			"target=%s; "+
-			"ext=%s",
+			"ext=%s"+
+			"formatter=%s",
 		opt.PackageName,
 		opt.SourceDir,
 		opt.TargetDir,
 		strings.Join(opt.SourceFilesExt, ","),
+		opt.Formatter,
 	)
 }

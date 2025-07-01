@@ -58,6 +58,7 @@ Usage:
 
 Flags:
       --ext strings      If set, source files will be filtered by these suffixes in names (default [.sql])
+      --fmt string       Formatter used to format generated go files (gofmt|noop) (default "gofmt")
   -h, --help             help for sqlamble
       --package string   Target package name of the generated code (default "queries")
   -s, --silent           Silent mode

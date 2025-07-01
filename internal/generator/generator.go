@@ -9,22 +9,30 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/kukymbr/sqlamble/internal/formatter"
 	"github.com/kukymbr/sqlamble/internal/generator/templates"
 	"github.com/kukymbr/sqlamble/internal/generator/types"
 	"github.com/kukymbr/sqlamble/internal/utils"
 	"github.com/kukymbr/sqlamble/internal/version"
 )
 
-func New(opt Options) *Generator {
-	return &Generator{
-		opt:      opt,
-		template: templates.ParseEmbeddedTemplates(),
+func New(opt Options) (*Generator, error) {
+	f, err := formatter.Factory(opt.Formatter)
+	if err != nil {
+		return nil, err
 	}
+
+	return &Generator{
+		opt:       opt,
+		formatter: f,
+		template:  templates.ParseEmbeddedTemplates(),
+	}, nil
 }
 
 type Generator struct {
-	opt      Options
-	template *template.Template
+	opt       Options
+	formatter formatter.Formatter
+	template  *template.Template
 }
 
 func (g *Generator) Generate(ctx context.Context) error {
@@ -49,6 +57,8 @@ func (g *Generator) Generate(ctx context.Context) error {
 			return err
 		}
 	}
+
+	g.format(ctx)
 
 	utils.PrintSuccessf("All done.")
 
@@ -209,4 +219,12 @@ func (g *Generator) initIdentifiers(
 	}
 
 	data.PrivateSlug = firstLower(data.PublicSlug)
+}
+
+func (g *Generator) format(ctx context.Context) {
+	utils.PrintDebugf("Formatting %s...", g.opt.TargetDir)
+
+	if err := g.formatter.Format(ctx, g.opt.TargetDir); err != nil {
+		utils.PrintWarningf("Failed to format generated code: %s", err.Error())
+	}
 }
