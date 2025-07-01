@@ -32,7 +32,7 @@ The `sqlamble` takes all these files on the `go generate` stage and converts the
 of the read-only strings. For example:
 
 ```go
-query := queries.Users().GetList()
+query := queries.Users().GetListQuery()
 ```
 
 ## Installation
