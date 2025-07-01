@@ -7,7 +7,7 @@ package {{ .Package }}
 {{ if .IsRoot }}
 var {{ .PrivateSlug }}Directory *{{ .PrefixedPublicSlug }}Directory
 
-func {{ .PublicSlug }}() *{{ .PrefixedPublicSlug }}Directory {
+func {{ .PrivateSlug }}() *{{ .PrefixedPublicSlug }}Directory {
     if {{ .PrivateSlug }}Directory == nil {
         {{ .PrivateSlug }}Directory = &{{ .PrefixedPublicSlug }}Directory{}
     }
@@ -26,6 +26,11 @@ type {{ .PrefixedPublicSlug }}Directory struct {
 func (d *{{ $.PrefixedPublicSlug }}Directory) {{ .PublicSlug }}Query() string {
     return {{ .GetQuotedContent }}
 }
+{{ if $.IsRoot }}
+func {{ .PublicSlug }}Query() string {
+    return {{ $.PrivateSlug }}().{{ .PublicSlug }}Query()
+}
+{{ end }}
 {{ end }}
 {{ range .Directories }}
 func (d *{{ $.PrefixedPublicSlug }}Directory) {{ .PublicSlug }}() *{{ .PrefixedPublicSlug }}Directory {
@@ -35,4 +40,9 @@ func (d *{{ $.PrefixedPublicSlug }}Directory) {{ .PublicSlug }}() *{{ .PrefixedP
 
 	return d.{{ .PrivateSlug }}Directory
 }
+{{ if $.IsRoot }}
+func {{ .PublicSlug }}() *{{ .PrefixedPublicSlug }}Directory {
+    return {{ $.PrivateSlug }}().{{ .PublicSlug }}()
+}
+{{ end }}
 {{ end }}

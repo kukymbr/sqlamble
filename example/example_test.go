@@ -8,9 +8,9 @@ import (
 )
 
 func Test_PrintGeneratedQueries(t *testing.T) {
-	fmt.Println(queries.Queries().VersionQuery())
-	fmt.Println(queries.Queries().Users().GetListQuery())
-	fmt.Println(queries.Queries().Users().SingleUser().GetUserDataQuery())
-	fmt.Println(queries.Queries().Orders().ChangeStatusQuery())
-	fmt.Println(queries.Queries().Orders().CreateOrderQuery())
+	fmt.Println(queries.VersionQuery())
+	fmt.Println(queries.Users().GetListQuery())
+	fmt.Println(queries.Users().SingleUser().GetUserDataQuery())
+	fmt.Println(queries.Orders().ChangeStatusQuery())
+	fmt.Println(queries.Orders().CreateOrderQuery())
 }

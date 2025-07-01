@@ -78,12 +78,12 @@ Flags:
    package users
    
    func GetUsers() []User {
-       query := queries.Queries().Users().GetListQuery()   
+       query := queries.Users().GetListQuery()   
 	   // ... go fetch some users
    }
    
    func GetUser() User {
-    query := queries.Queries().Users().SingleUser().GetUserDataQuery()
+    query := queries.Users().SingleUser().GetUserDataQuery()
 	   // ... go fetch some user data
    }
    ```
