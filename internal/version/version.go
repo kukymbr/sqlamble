@@ -4,9 +4,9 @@ import "fmt"
 
 // These variables are populated during the build.
 var (
-	Version  string
-	Revision string
-	BuiltAt  string
+	Version  = "unknown"
+	Revision = "unknown"
+	BuiltAt  = "20250701000000"
 )
 
 func GetVersion() string {
