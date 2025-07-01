@@ -60,8 +60,10 @@ Flags:
       --ext strings      If set, source files will be filtered by these suffixes in names (default [.sql])
   -h, --help             help for sqlamble
       --package string   Target package name of the generated code (default "queries")
+  -s, --silent           Silent mode
       --source string    Directory containing SQL files (default ".")
       --target string    Directory for the generated Go files (default "internal/queries")
+  -v, --version          version for sqlamble
 ```
 
 1. Create sql files directory and put some SQL inside it (any level of subdirectories is supported), for example `sql/`.

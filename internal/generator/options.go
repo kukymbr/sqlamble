@@ -22,6 +22,8 @@ type Options struct {
 	// TargetDir is a target go code directory.
 	TargetDir string
 
+	// SourceFilesExt is a list of source files extensions (or suffixes).
+	// If defined, files not matching any of these suffixes, will be ignored.
 	SourceFilesExt []string
 }
 

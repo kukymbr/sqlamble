@@ -23,6 +23,7 @@ func Run() {
 
 func run() error {
 	opt := generator.Options{}
+	silent := false
 
 	var cmd = &cobra.Command{
 		Use:   "sqlamble",
@@ -47,12 +48,18 @@ See https://github.com/kukymbr/sqlamble for info.`,
 		Version: version.GetVersion(),
 	}
 
-	initFlags(cmd, &opt)
+	initFlags(cmd, &opt, &silent)
+
+	cmd.PersistentPreRun = func(_ *cobra.Command, _ []string) {
+		utils.SetSilentMode(silent)
+	}
 
 	return cmd.Execute()
 }
 
-func initFlags(cmd *cobra.Command, opt *generator.Options) {
+func initFlags(cmd *cobra.Command, opt *generator.Options, silent *bool) {
+	cmd.PersistentFlags().BoolVarP(silent, "silent", "s", false, "Silent mode")
+
 	cmd.Flags().StringVar(
 		&opt.PackageName,
 		"package",
