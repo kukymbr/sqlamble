@@ -1,0 +1,15 @@
+name: Publish to pkg.go.dev
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  bump-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Ping Golang proxy
+        run: curl "https://proxy.golang.org/github.com/kukymbr/sqlamble/@v/$(git describe HEAD --tags --abbrev=0).info"
