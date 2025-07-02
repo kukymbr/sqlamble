@@ -4,6 +4,11 @@
 
 > For those who hate SQL inside the Go code.
 
+[![License](https://img.shields.io/github/license/kukymbr/sqlamble.svg)](https://github.com/kukymbr/sqlamble/blob/main/LICENSE)
+[![Release](https://img.shields.io/github/release/kukymbr/sqlamble.svg)](https://github.com/kukymbr/sqlamble/releases/latest)
+[![GoDoc](https://godoc.org/github.com/kukymbr/sqlamble?status.svg)](https://godoc.org/github.com/kukymbr/sqlamble)
+[![GoReport](https://goreportcard.com/badge/github.com/kukymbr/sqlamble)](https://goreportcard.com/report/github.com/kukymbr/sqlamble)
+
 The `sqlamble` tool allows you to embed your SQL queries into the Golang code in structural read-only way.
 
 ## Why?
