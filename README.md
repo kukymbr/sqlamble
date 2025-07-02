@@ -59,14 +59,15 @@ Usage:
   sqlamble [flags]
 
 Flags:
-      --ext strings      If set, source files will be filtered by these suffixes in names (default [.sql])
-      --fmt string       Formatter used to format generated go files (gofmt|noop) (default "gofmt")
-  -h, --help             help for sqlamble
-      --package string   Target package name of the generated code (default "queries")
-  -s, --silent           Silent mode
-      --source string    Directory containing SQL files (default ".")
-      --target string    Directory for the generated Go files (default "internal/queries")
-  -v, --version          version for sqlamble
+      --ext strings           If set, source files will be filtered by these suffixes in names (default [.sql])
+      --fmt string            Formatter used to format generated go files (gofmt|noop) (default "gofmt")
+  -h, --help                  help for sqlamble
+      --package string        Target package name of the generated code (default "queries")
+      --query-suffix string   Suffix for query getter functions (default "Query")
+  -s, --silent                Silent mode
+      --source string         Directory containing SQL files (default ".")
+      --target string         Directory for the generated Go files (default "internal/queries")
+  -v, --version               version for sqlamble
 ```
 
 1. Create sql files directory and put some SQL inside it (any level of subdirectories is supported), for example `sql/`.

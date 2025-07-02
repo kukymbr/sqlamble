@@ -171,9 +171,10 @@ func (g *Generator) newDirectoryInstance(path string, name string, parent *types
 
 func (g *Generator) newGenericData(path string, name string, parent *types.Directory) types.GenericData {
 	d := types.GenericData{
-		Package:    g.opt.PackageName,
-		Version:    version.GetVersion(),
-		SourcePath: path,
+		Package:           g.opt.PackageName,
+		Version:           version.GetVersion(),
+		SourcePath:        path,
+		QueryGetterSuffix: g.opt.QueryGetterSuffix,
 	}
 
 	if name == "" {

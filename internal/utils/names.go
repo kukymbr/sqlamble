@@ -3,9 +3,18 @@ package utils
 import (
 	"fmt"
 	"regexp"
+	"unicode"
 )
 
 var pxIdentifier = regexp.MustCompile(`(?i)^[a-z]+[a-z0-9_]*$`)
+
+func ValidateQueryGetterSuffix(suffix string) error {
+	if err := ValidateIdentifier(suffix); err != nil {
+		return fmt.Errorf("invalid query getter function suffix: %w", err)
+	}
+
+	return nil
+}
 
 func ValidatePackageName(name string) error {
 	if err := ValidateIdentifier(name); err != nil {
@@ -25,4 +34,11 @@ func ValidateIdentifier(name string) error {
 	}
 
 	return nil
+}
+
+func FirstUpper(inp string) string {
+	runes := []rune(inp)
+	runes[0] = unicode.ToUpper(runes[0])
+
+	return string(runes)
 }

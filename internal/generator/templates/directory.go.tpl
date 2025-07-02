@@ -17,17 +17,15 @@ func {{ .PrivateSlug }}() *{{ .PrefixedPublicSlug }}Directory {
 {{ end }}
 
 type {{ .PrefixedPublicSlug }}Directory struct {
-	{{ range .Queries }}{{ .PrivateSlug }}Query string
-	{{ end }}
 	{{ range .Directories }}{{ .PrivateSlug }}Directory *{{ .PrefixedPublicSlug }}Directory
 	{{ end }}
 }
 {{ range .Queries }}
-func (d *{{ $.PrefixedPublicSlug }}Directory) {{ .PublicSlug }}Query() string {
+func (d *{{ $.PrefixedPublicSlug }}Directory) {{ .PublicSlug }}{{ .QueryGetterSuffix }}() string {
     return {{ .GetQuotedContent }}
 }
 {{ if $.IsRoot }}
-func {{ .PublicSlug }}Query() string {
+func {{ .PublicSlug }}{{ .QueryGetterSuffix }}() string {
     return {{ $.PrivateSlug }}().{{ .PublicSlug }}Query()
 }
 {{ end }}

@@ -11,4 +11,6 @@ type GenericData struct {
 	PublicSlug         string
 	PrefixedPublicSlug string
 	PrivateSlug        string
+
+	QueryGetterSuffix string
 }

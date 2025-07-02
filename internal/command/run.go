@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/kukymbr/sqlamble/internal/formatter"
@@ -98,9 +99,19 @@ func initFlags(cmd *cobra.Command, opt *generator.Options, silent *bool) {
 		formatter.DefaultFormatter,
 		"Formatter used to format generated go files (gofmt|noop)",
 	)
+
+	cmd.Flags().StringVar(
+		&opt.QueryGetterSuffix,
+		"query-suffix",
+		generator.DefaultQueryGetterSuffix,
+		"Suffix for query getter functions",
+	)
 }
 
 func prepareOptions(opt *generator.Options) error {
+	opt.PackageName = strings.TrimSpace(opt.PackageName)
+	opt.QueryGetterSuffix = strings.TrimSpace(opt.QueryGetterSuffix)
+
 	if opt.PackageName == "" {
 		opt.PackageName = generator.DefaultPackageName
 	}
@@ -117,6 +128,12 @@ func prepareOptions(opt *generator.Options) error {
 		opt.Formatter = formatter.DefaultFormatter
 	}
 
+	if opt.QueryGetterSuffix == "" {
+		opt.QueryGetterSuffix = generator.DefaultQueryGetterSuffix
+	}
+
+	opt.QueryGetterSuffix = utils.FirstUpper(opt.QueryGetterSuffix)
+
 	if err := utils.ValidateIsDir(opt.SourceDir); err != nil {
 		return err
 	}
@@ -125,15 +142,37 @@ func prepareOptions(opt *generator.Options) error {
 		return err
 	}
 
+	if err := utils.ValidateQueryGetterSuffix(opt.QueryGetterSuffix); err != nil {
+		return err
+	}
+
 	if err := utils.EnsureDir(opt.TargetDir); err != nil {
 		return err
 	}
 
-	if len(opt.SourceFilesExt) == 1 && opt.SourceFilesExt[0] == "" {
-		opt.SourceFilesExt = nil
-	} else {
-		opt.SourceFilesExt = []string{generator.DefaultSourceFilesExtension}
-	}
+	opt.SourceFilesExt = prepareSourceFilesExt(opt.SourceFilesExt)
 
 	return nil
+}
+
+func prepareSourceFilesExt(exts []string) []string {
+	// Filtering in disabled.
+	if len(exts) == 1 && exts[0] == "" {
+		return nil
+	}
+
+	res := make([]string, 0, len(exts))
+
+	for _, ext := range exts {
+		ext = strings.TrimSpace(ext)
+		if ext != "" {
+			res = append(res, ext)
+		}
+	}
+
+	if len(res) == 0 {
+		return []string{generator.DefaultSourceFilesExtension}
+	}
+
+	return res
 }
