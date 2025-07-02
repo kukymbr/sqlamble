@@ -98,6 +98,20 @@ Flags:
 
 See the [example](example) directory for a full example.
 
+### Hidden features
+
+In fact, it's okay to embed any type of string content into the Go code
+using the sqlamble, because there is no parsing of the SQL syntax itself.
+
+For example, you could embed set of YAMLs:
+
+```shell
+go tool sqlamble --package=configs --target=internal/configs --query-suffix=YAML --ext=.yaml,.yml
+```
+
+See the generator's [testdata](internal/generator/testdata/source/yaml) 
+and [test code](internal/generator/generator_test.go) for an example.
+
 ## Contributing
 
 Please, refer the [CONTRIBUTING.md](CONTRIBUTING.md) doc.
