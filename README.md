@@ -1,4 +1,6 @@
-# 🍳 sqlamble
+<img align="right" width="125" src="sqlamble.png" alt="image with a gopher with a fried egg">
+
+# sqlamble
 
 > For those who hate SQL inside the Go code.
 
