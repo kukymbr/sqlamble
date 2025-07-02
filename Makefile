@@ -2,10 +2,11 @@ GOLANGCI_LINT_VERSION := 2.1.6
 
 GIT_VERSION := $(shell git describe --tags --always)
 GIT_REVISION := $(shell git rev-parse HEAD)
+VERSION_PACKAGE := "github.com/kukymbr/sqlamble/internal/version"
 
-GO_BUILD_LDFLAGS := "-X github.com/kukymbr/sqlamble/internal/version.Version=$(GIT_VERSION) \
-                -X github.com/kukymbr/sqlamble/internal/version.Revision=$(GIT_REVISION) \
-                -X github.com/kukymbr/sqlamble/internal/version.BuiltAt=$(shell date -u +%Y%m%d%H%M%S)"
+GO_BUILD_LDFLAGS := "-X $(VERSION_PACKAGE).Version=$(GIT_VERSION) \
+                -X $(VERSION_PACKAGE).Revision=$(GIT_REVISION) \
+                -X $(VERSION_PACKAGE).BuiltAt=$(shell date -u +%Y%m%d%H%M%S)"
 GO_BUILD_ARGS := $(build_arguments) --ldflags $(GO_BUILD_LDFLAGS)
 
 all:
@@ -50,4 +51,9 @@ clean:
 	go clean
 
 generate_example:
-	go generate ./example/sql
+	go build \
+		--ldflags "-X $(VERSION_PACKAGE).BuiltAt=$(shell date -u +%Y%m%d%H%M%S)" \
+		-o bin/sqlamble_example \
+		./cmd/sqlamble
+	./bin/sqlamble_example --source=example/sql --target=example/internal/queries --fmt=gofmt
+	rm ./bin/sqlamble_example

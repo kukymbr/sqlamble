@@ -1,4 +1,4 @@
-<img align="right" width="125" src="sqlamble.png" alt="image with a gopher with a fried egg">
+<img align="right" width="125" src="sqlamble.png" alt="image with a gopher holding a fried egg">
 
 # sqlamble
 
