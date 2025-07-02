@@ -26,7 +26,7 @@ func (d *{{ $.PrefixedPublicSlug }}Directory) {{ .PublicSlug }}{{ .QueryGetterSu
 }
 {{ if $.IsRoot }}
 func {{ .PublicSlug }}{{ .QueryGetterSuffix }}() string {
-    return {{ $.PrivateSlug }}().{{ .PublicSlug }}Query()
+    return {{ $.PrivateSlug }}().{{ .PublicSlug }}{{ .QueryGetterSuffix }}()
 }
 {{ end }}
 {{ end }}

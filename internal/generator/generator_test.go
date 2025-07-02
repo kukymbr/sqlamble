@@ -1,0 +1,165 @@
+package generator_test
+
+import (
+	"context"
+	"io"
+	"io/fs"
+	"os"
+	"testing"
+
+	"github.com/kukymbr/sqlamble/internal/formatter"
+	"github.com/kukymbr/sqlamble/internal/generator"
+	"github.com/stretchr/testify/suite"
+)
+
+func TestGenerator(t *testing.T) {
+	suite.Run(t, &GeneratorSuite{})
+}
+
+type GeneratorSuite struct {
+	suite.Suite
+
+	targets map[string]struct{}
+}
+
+func (s *GeneratorSuite) SetupSuite() {
+	s.targets = make(map[string]struct{})
+}
+
+func (s *GeneratorSuite) TearDownSuite() {
+	for path := range s.targets {
+		_ = os.RemoveAll(path)
+	}
+}
+
+func (s *GeneratorSuite) TestGenerate() {
+	tests := []struct {
+		Name                  string
+		GetOptFunc            func() generator.Options
+		AssertConstructorFunc func(err error)
+		AssertFunc            func(targetFS fs.FS, err error)
+	}{
+		{
+			Name: "sql",
+			GetOptFunc: func() generator.Options {
+				return generator.Options{
+					SourceDir: "testdata/source/sql",
+				}
+			},
+			AssertConstructorFunc: func(err error) {
+				s.Require().NoError(err)
+			},
+			AssertFunc: func(targetFS fs.FS, err error) {
+				s.Require().NoError(err)
+				s.Require().NotNil(targetFS)
+				s.assertFile(
+					targetFS,
+					"queries.go",
+					"package queries",
+					"VersionQuery()",
+					"SELECT version FROM app_info;",
+					"Users()",
+				)
+				s.assertFile(
+					targetFS,
+					"users.go",
+					"GetListQuery()",
+					"SingleUser()",
+				)
+				s.assertFile(
+					targetFS,
+					"users-single-user.go",
+					"GetUserDataQuery()",
+					"SELECT * FROM users WHERE id = $1;",
+				)
+			},
+		},
+		{
+			Name: "yaml",
+			GetOptFunc: func() generator.Options {
+				return generator.Options{
+					PackageName:       "configs",
+					SourceDir:         "testdata/source/yaml",
+					SourceFilesExt:    []string{".yml", ".yaml"},
+					QueryGetterSuffix: "YAML",
+				}
+			},
+			AssertConstructorFunc: func(err error) {
+				s.Require().NoError(err)
+			},
+			AssertFunc: func(targetFS fs.FS, err error) {
+				s.Require().NoError(err)
+				s.Require().NotNil(targetFS)
+				s.assertFile(
+					targetFS,
+					"configs.go",
+					"package configs",
+					"ConfigYAML()",
+					"descriptions: Yes, in fact, you can use sqlamble to embed any type of content info the go code.",
+					"Nested()",
+				)
+				s.assertFile(
+					targetFS,
+					"nested.go",
+					"OtherYAML() string",
+				)
+			},
+		},
+	}
+
+	for _, test := range tests {
+		s.Run(test.Name, func() {
+			targetPath := s.prepareTarget(test.Name)
+			targetFS := os.DirFS(targetPath)
+
+			opt := test.GetOptFunc()
+			opt.TargetDir = targetPath
+			opt.Formatter = formatter.Noop
+
+			gen, err := generator.New(opt)
+			test.AssertConstructorFunc(err)
+
+			err = gen.Generate(context.Background())
+			test.AssertFunc(targetFS, err)
+		})
+	}
+}
+
+func (s *GeneratorSuite) assertFile(fsys fs.FS, path string, expectContains ...string) {
+	s.T().Helper()
+
+	statFS := fsys.(fs.StatFS)
+
+	stat, err := statFS.Stat(path)
+
+	s.Require().NoError(err)
+	s.Require().NotNil(stat)
+	s.Require().False(stat.IsDir(), "expected file, got a directory")
+
+	if len(expectContains) == 0 {
+		return
+	}
+
+	f, err := fsys.Open(path)
+	s.Require().NoError(err)
+
+	content, err := io.ReadAll(f)
+	s.Require().NoError(err)
+
+	for _, substr := range expectContains {
+		s.Require().Contains(string(content), substr)
+	}
+}
+
+func (s *GeneratorSuite) prepareTarget(name string) string {
+	s.T().Helper()
+
+	targetPath := "testdata/target/" + name
+
+	_ = os.RemoveAll(targetPath)
+	s.Require().NoError(os.MkdirAll(targetPath, 0755))
+
+	s.targets[targetPath] = struct{}{}
+
+	return targetPath
+}

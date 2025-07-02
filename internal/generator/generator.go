@@ -17,6 +17,10 @@ import (
 )
 
 func New(opt Options) (*Generator, error) {
+	if err := prepareOptions(&opt); err != nil {
+		return nil, err
+	}
+
 	f, err := formatter.Factory(opt.Formatter)
 	if err != nil {
 		return nil, err

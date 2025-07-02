@@ -1,0 +1,3 @@
+config:
+  version: 1.0.0
+  descriptions: Yes, in fact, you can use sqlamble to embed any type of content info the go code.

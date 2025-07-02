@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 
 	"github.com/kukymbr/sqlamble/internal/formatter"
@@ -35,10 +34,6 @@ See https://github.com/kukymbr/sqlamble for info.`,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 			defer cancel()
-
-			if err := prepareOptions(&opt); err != nil {
-				return err
-			}
 
 			gen, err := generator.New(opt)
 			if err != nil {
@@ -106,73 +101,4 @@ func initFlags(cmd *cobra.Command, opt *generator.Options, silent *bool) {
 		generator.DefaultQueryGetterSuffix,
 		"Suffix for query getter functions",
 	)
-}
-
-func prepareOptions(opt *generator.Options) error {
-	opt.PackageName = strings.TrimSpace(opt.PackageName)
-	opt.QueryGetterSuffix = strings.TrimSpace(opt.QueryGetterSuffix)
-
-	if opt.PackageName == "" {
-		opt.PackageName = generator.DefaultPackageName
-	}
-
-	if opt.SourceDir == "" {
-		opt.SourceDir = generator.DefaultSourceDir
-	}
-
-	if opt.TargetDir == "" {
-		opt.TargetDir = generator.DefaultTargetDir
-	}
-
-	if opt.Formatter == "" {
-		opt.Formatter = formatter.DefaultFormatter
-	}
-
-	if opt.QueryGetterSuffix == "" {
-		opt.QueryGetterSuffix = generator.DefaultQueryGetterSuffix
-	}
-
-	opt.QueryGetterSuffix = utils.FirstUpper(opt.QueryGetterSuffix)
-
-	if err := utils.ValidateIsDir(opt.SourceDir); err != nil {
-		return err
-	}
-
-	if err := utils.ValidatePackageName(opt.PackageName); err != nil {
-		return err
-	}
-
-	if err := utils.ValidateQueryGetterSuffix(opt.QueryGetterSuffix); err != nil {
-		return err
-	}
-
-	if err := utils.EnsureDir(opt.TargetDir); err != nil {
-		return err
-	}
-
-	opt.SourceFilesExt = prepareSourceFilesExt(opt.SourceFilesExt)
-
-	return nil
-}
-
-func prepareSourceFilesExt(exts []string) []string {
-	// Filtering in disabled.
-	if len(exts) == 1 && exts[0] == "" {
-		return nil
-	}
-
-	res := make([]string, 0, len(exts))
-
-	for _, ext := range exts {
-		ext = strings.TrimSpace(ext)
-		if ext != "" {
-			res = append(res, ext)
-		}
-	}
-
-	if len(res) == 0 {
-		return []string{generator.DefaultSourceFilesExtension}
-	}
-
-	return res
 }

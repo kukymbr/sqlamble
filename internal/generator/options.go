@@ -2,6 +2,9 @@ package generator
 
 import (
 	"strings"
+
+	"github.com/kukymbr/sqlamble/internal/formatter"
+	"github.com/kukymbr/sqlamble/internal/utils"
 )
 
 const (
@@ -50,4 +53,73 @@ func (opt Options) Debug() string {
 	}
 
 	return strings.Join(values, "; ")
+}
+
+func prepareOptions(opt *Options) error {
+	opt.PackageName = strings.TrimSpace(opt.PackageName)
+	opt.QueryGetterSuffix = strings.TrimSpace(opt.QueryGetterSuffix)
+
+	if opt.PackageName == "" {
+		opt.PackageName = DefaultPackageName
+	}
+
+	if opt.SourceDir == "" {
+		opt.SourceDir = DefaultSourceDir
+	}
+
+	if opt.TargetDir == "" {
+		opt.TargetDir = DefaultTargetDir
+	}
+
+	if opt.Formatter == "" {
+		opt.Formatter = formatter.DefaultFormatter
+	}
+
+	if opt.QueryGetterSuffix == "" {
+		opt.QueryGetterSuffix = DefaultQueryGetterSuffix
+	}
+
+	opt.QueryGetterSuffix = utils.FirstUpper(opt.QueryGetterSuffix)
+
+	if err := utils.ValidateIsDir(opt.SourceDir); err != nil {
+		return err
+	}
+
+	if err := utils.ValidatePackageName(opt.PackageName); err != nil {
+		return err
+	}
+
+	if err := utils.ValidateQueryGetterSuffix(opt.QueryGetterSuffix); err != nil {
+		return err
+	}
+
+	if err := utils.EnsureDir(opt.TargetDir); err != nil {
+		return err
+	}
+
+	opt.SourceFilesExt = prepareSourceFilesExt(opt.SourceFilesExt)
+
+	return nil
+}
+
+func prepareSourceFilesExt(exts []string) []string {
+	// Filtering in disabled.
+	if len(exts) == 1 && exts[0] == "" {
+		return nil
+	}
+
+	res := make([]string, 0, len(exts))
+
+	for _, ext := range exts {
+		ext = strings.TrimSpace(ext)
+		if ext != "" {
+			res = append(res, ext)
+		}
+	}
+
+	if len(res) == 0 {
+		return []string{DefaultSourceFilesExtension}
+	}
+
+	return res
 }
