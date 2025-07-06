@@ -7,36 +7,53 @@ import (
 	"github.com/kukymbr/sqlamble/internal/utils"
 )
 
-// Cases:
-//
-// name
-// test-name
-// test_name
-// test name
-// TestName
-// Test_Name
-// Test Name
-// test.name
 func nameToParts(name string) []string {
-	name = strings.TrimFunc(name, unicodeSepFunc)
-	parts := strings.FieldsFunc(name, unicodeSepFunc)
-	res := make([]string, 0, len(parts))
+	runes := []rune(name)
+	parts := make([]string, 1)
+	index := 0
 
-	for _, part := range parts {
-		if err := utils.ValidateIdentifier(part); err != nil {
+	next := func() {
+		if err := utils.ValidateIdentifier(parts[index]); err != nil {
+			parts[index] = ""
+
+			return
+		}
+
+		parts[index] = strings.ToLower(parts[index])
+		parts = append(parts, "")
+
+		index++
+	}
+
+	for i, r := range runes {
+		if unicode.IsUpper(r) {
+			if len(parts[index]) > 0 &&
+				// do not split UPPERCASE words
+				i >= 1 && !unicode.IsUpper(runes[i-1]) {
+				next()
+			}
+
+			parts[index] += string(r)
+
 			continue
 		}
 
-		part = strings.ToLower(part)
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			parts[index] += string(r)
 
-		res = append(res, part)
+			continue
+		}
+
+		next()
 	}
 
-	return res
-}
+	next()
 
-func unicodeSepFunc(r rune) bool {
-	return r == '-' || r == '_' || r == '.' || r == ':' || unicode.IsSpace(r)
+	if parts[len(parts)-1] == "" {
+		parts = parts[:len(parts)-1]
+	}
+
+	return parts
 }
 
 func partsToCapitalized(parts []string, firstLower bool) string {

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"unicode"
@@ -26,7 +27,7 @@ func ValidatePackageName(name string) error {
 
 func ValidateIdentifier(name string) error {
 	if len(name) == 0 {
-		return fmt.Errorf("identifier cannot be empty")
+		return errors.New("identifier cannot be empty")
 	}
 
 	if !pxIdentifier.MatchString(name) {
