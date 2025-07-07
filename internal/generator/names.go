@@ -84,13 +84,9 @@ func nameToWords(name string) []string {
 	return words
 }
 
-func wordsToCapitalized(parts []string, firstLower bool) string {
+func wordsToCapitalized(parts []string) string {
 	res := ""
-
 	start := 0
-	if firstLower {
-		start = 1
-	}
 
 	for i := start; i < len(parts); i++ {
 		part := parts[i]

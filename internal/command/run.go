@@ -40,9 +40,6 @@ See https://github.com/kukymbr/sqlamble for info.`,
 				return err
 			}
 
-			utils.PrintHellof("Hi, this is sqlamble generator.")
-			utils.PrintDebugf("Options: " + opt.Debug())
-
 			return gen.Generate(ctx)
 		},
 		Version: version.GetVersion(),

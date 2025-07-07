@@ -26,6 +26,9 @@ func New(opt Options) (*Generator, error) {
 		return nil, err
 	}
 
+	utils.PrintHellof("Hi, this is sqlamble generator.")
+	utils.PrintDebugf("Options: " + opt.Debug())
+
 	return &Generator{
 		opt:       opt,
 		formatter: f,
@@ -213,13 +216,13 @@ func (g *Generator) initIdentifiers(
 	}
 
 	data.Identifier = wordsToIdentifier(parts)
-	data.PublicSlug = wordsToCapitalized(parts, false)
+	data.PublicSlug = wordsToCapitalized(parts)
 	data.PrefixedPublicSlug = data.PublicSlug
 
 	if parent != nil && (!parent.IsRoot || parent.Identifier == data.Identifier) {
 		if prefixParts := nameToWords(parent.Identifier); len(prefixParts) > 0 {
 			data.Identifier = wordsToIdentifier(prefixParts) + "-" + data.Identifier
-			data.PrefixedPublicSlug = wordsToCapitalized(prefixParts, false) + data.PrefixedPublicSlug
+			data.PrefixedPublicSlug = wordsToCapitalized(prefixParts) + data.PrefixedPublicSlug
 		}
 	}
 

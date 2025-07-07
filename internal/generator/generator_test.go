@@ -12,6 +12,14 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+type generatorGenerateTestCase struct {
+	Name                  string
+	GetOptFunc            func() generator.Options
+	GetContextFunc        func() context.Context
+	AssertConstructorFunc func(err error)
+	AssertFunc            func(targetFS fs.FS, err error)
+}
+
 func TestGenerator(t *testing.T) {
 	suite.Run(t, &GeneratorSuite{})
 }
@@ -32,13 +40,8 @@ func (s *GeneratorSuite) TearDownSuite() {
 	}
 }
 
-func (s *GeneratorSuite) TestGenerate() {
-	tests := []struct {
-		Name                  string
-		GetOptFunc            func() generator.Options
-		AssertConstructorFunc func(err error)
-		AssertFunc            func(targetFS fs.FS, err error)
-	}{
+func (s *GeneratorSuite) TestGenerator_PositiveCases() {
+	tests := []generatorGenerateTestCase{
 		{
 			Name: "sql",
 			GetOptFunc: func() generator.Options {
@@ -72,6 +75,7 @@ func (s *GeneratorSuite) TestGenerate() {
 					"GetUserDataQuery()",
 					"SELECT * FROM users WHERE id = $1;",
 				)
+				s.assertNoFile(targetFS, "users-ignored.go")
 			},
 		},
 		{
@@ -109,19 +113,103 @@ func (s *GeneratorSuite) TestGenerate() {
 
 	for _, test := range tests {
 		s.Run(test.Name, func() {
-			targetPath := s.prepareTarget(test.Name)
-			targetFS := os.DirFS(targetPath)
-
-			opt := test.GetOptFunc()
-			opt.TargetDir = targetPath
-			opt.Formatter = formatter.Noop
-
-			gen, err := generator.New(opt)
-			test.AssertConstructorFunc(err)
-
-			err = gen.Generate(context.Background())
-			test.AssertFunc(targetFS, err)
+			s.runGeneratorGenerateTest(test)
 		})
+	}
+}
+
+func (s *GeneratorSuite) TestGenerator_NegativeCases() {
+	tests := []generatorGenerateTestCase{
+		{
+			Name: "when source dir does not exist",
+			GetOptFunc: func() generator.Options {
+				return generator.Options{
+					SourceDir: "testdata/unknown_dir",
+				}
+			},
+			AssertConstructorFunc: func(err error) {
+				s.Require().Error(err)
+			},
+		},
+		{
+			Name: "when query getter suffix is invalid",
+			GetOptFunc: func() generator.Options {
+				return generator.Options{
+					SourceDir:         "testdata/source/sql",
+					QueryGetterSuffix: "- -",
+				}
+			},
+			AssertConstructorFunc: func(err error) {
+				s.Require().Error(err)
+			},
+		},
+		{
+			Name: "when formatter is invalid",
+			GetOptFunc: func() generator.Options {
+				return generator.Options{
+					SourceDir: "testdata/source/sql",
+					Formatter: "unknown formatter",
+				}
+			},
+			AssertConstructorFunc: func(err error) {
+				s.Require().Error(err)
+			},
+		},
+		{
+			Name: "when context is canceled",
+			GetContextFunc: func() context.Context {
+				ctx, cancel := context.WithCancel(context.Background())
+				cancel()
+
+				return ctx
+			},
+			GetOptFunc: func() generator.Options {
+				return generator.Options{
+					SourceDir: "testdata/source/sql",
+				}
+			},
+			AssertConstructorFunc: func(err error) {
+				s.Require().NoError(err)
+			},
+			AssertFunc: func(targetFS fs.FS, err error) {
+				s.Require().ErrorIs(err, context.Canceled)
+			},
+		},
+	}
+
+	for _, test := range tests {
+		s.Run(test.Name, func() {
+			s.runGeneratorGenerateTest(test)
+		})
+	}
+}
+
+func (s *GeneratorSuite) runGeneratorGenerateTest(test generatorGenerateTestCase) {
+	targetPath := s.prepareTarget(test.Name)
+	targetFS := os.DirFS(targetPath)
+
+	opt := test.GetOptFunc()
+	opt.TargetDir = targetPath
+
+	if opt.Formatter == "" {
+		opt.Formatter = formatter.Noop
+	}
+
+	gen, err := generator.New(opt)
+	test.AssertConstructorFunc(err)
+
+	if err != nil {
+		return
+	}
+
+	ctx := context.Background()
+	if test.GetContextFunc != nil {
+		ctx = test.GetContextFunc()
+	}
+
+	err = gen.Generate(ctx)
+	if test.AssertFunc != nil {
+		test.AssertFunc(targetFS, err)
 	}
 }
 
@@ -149,6 +237,15 @@ func (s *GeneratorSuite) assertFile(fsys fs.FS, path string, expectContains ...s
 	for _, substr := range expectContains {
 		s.Require().Contains(string(content), substr)
 	}
+}
+
+func (s *GeneratorSuite) assertNoFile(fsys fs.FS, path string) {
+	s.T().Helper()
+
+	statFS := fsys.(fs.StatFS)
+	_, err := statFS.Stat(path)
+
+	s.Require().True(os.IsNotExist(err), "expected file to not exist")
 }
 
 func (s *GeneratorSuite) prepareTarget(name string) string {
