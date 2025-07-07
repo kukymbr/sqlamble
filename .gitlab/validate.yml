@@ -1,5 +1,5 @@
 include:
-  - gocache.yml
+  - .gitlab/gocache.yml
 
 validate:
   extends: .go_cache

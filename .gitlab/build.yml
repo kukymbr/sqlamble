@@ -1,5 +1,5 @@
 include:
-  - gocache.yml
+  - .gitlab/gocache.yml
 
 build:
   extends: .go_cache
