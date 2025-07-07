@@ -8,6 +8,8 @@
 [![Release](https://img.shields.io/github/release/kukymbr/sqlamble.svg)](https://github.com/kukymbr/sqlamble/releases/latest)
 [![GoDoc](https://godoc.org/github.com/kukymbr/sqlamble?status.svg)](https://godoc.org/github.com/kukymbr/sqlamble)
 [![GoReport](https://goreportcard.com/badge/github.com/kukymbr/sqlamble)](https://goreportcard.com/report/github.com/kukymbr/sqlamble)
+[![Pipeline](https://gitlab.com/kukymbr/sqlamble/badges/main/pipeline.svg)](https://gitlab.com/kukymbr/sqlamble/-/pipelines/)
+[![Coverage](https://gitlab.com/kukymbr/sqlamble/badges/main/coverage.svg)](https://gitlab.com/kukymbr/sqlamble/)
 
 The `sqlamble` tool allows you to embed your SQL queries into the Golang code in structural read-only way.
 
