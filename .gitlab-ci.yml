@@ -1,0 +1,9 @@
+stages:
+  - validate
+  - build
+  - release
+
+include:
+  - .gitlab/validate.yml
+  - .gitlab/build.yml
+  - .gitlab/release.yml

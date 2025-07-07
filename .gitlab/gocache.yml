@@ -1,0 +1,13 @@
+# Snippet to add go packages to the gitlab cache.
+.go_cache:
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+    LINTER_PATH: $CI_PROJECT_DIR/bin/golangci-lint
+  cache:
+    paths:
+      - $GOPATH/pkg/mod/
+      - $LINTER_PATH
+    key:
+      files:
+        - go.sum
+        - Makefile
