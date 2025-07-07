@@ -119,6 +119,13 @@ go tool sqlamble --package=configs --target=internal/configs --query-suffix=YAML
 See the generator's [testdata](internal/generator/testdata/source/yaml) 
 and [test code](internal/generator/generator_test.go) for an example.
 
+## Comparing with sqlc
+
+The [sqlc](https://github.com/sqlc-dev/sqlc) is a powerful tool, generating code from the SQL queries.
+There is a principal difference with `sqlamble`: sqlamble is just an "embedder", generating constant queries getters.
+We don't parse any SQL, don't wrap execution logic and do not generate any data-related models or types.
+Just moving the SQL code away. 
+
 ## Contributing
 
 Please, refer the [CONTRIBUTING.md](CONTRIBUTING.md) doc.
