@@ -3,60 +3,88 @@ package generator
 import (
 	"strings"
 	"unicode"
-
-	"github.com/kukymbr/sqlamble/internal/utils"
 )
 
-func nameToParts(name string) []string {
-	runes := []rune(name)
-	parts := make([]string, 1)
-	index := 0
+const (
+	runeStateNone byte = iota
+	runeStateUpper
+	runeStateLower
+	runeStateNumber
+)
 
-	next := func() {
-		if err := utils.ValidateIdentifier(parts[index]); err != nil {
-			parts[index] = ""
+//nolint:cyclop,funlen
+func nameToWords(name string) []string {
+	var (
+		words []string
+		word  []rune
+		state = runeStateNone
+	)
 
+	writeWord := func() {
+		if len(word) == 0 {
 			return
 		}
 
-		parts[index] = strings.ToLower(parts[index])
-		parts = append(parts, "")
+		s := string(word)
+		word = nil
+		state = runeStateNone
 
-		index++
+		words = append(words, s)
 	}
 
-	for i, r := range runes {
+	addToWord := func(r rune, runeType byte) {
+		if runeType == runeStateUpper {
+			r = unicode.ToLower(r)
+		}
+
+		state = runeType
+
+		word = append(word, r)
+	}
+
+	//nolint:staticcheck
+	for _, r := range name {
+		if unicode.IsDigit(r) {
+			addToWord(r, runeStateNumber)
+
+			continue
+		}
+
+		if !unicode.IsLetter(r) {
+			writeWord()
+
+			continue
+		}
+
+		var runeType byte
+
 		if unicode.IsUpper(r) {
-			if len(parts[index]) > 0 &&
-				// do not split UPPERCASE words
-				i >= 1 && !unicode.IsUpper(runes[i-1]) {
-				next()
-			}
-
-			parts[index] += string(r)
-
-			continue
+			runeType = runeStateUpper
+		} else {
+			runeType = runeStateLower
 		}
 
-		if unicode.IsLetter(r) || unicode.IsDigit(r) {
-			parts[index] += string(r)
+		breakWord := state != runeStateNone
+		//nolint:staticcheck
+		// Ignoring QF1001 (could apply De Morgan's law) I find it more readable as it is now.
+		breakWord = breakWord && !(state == runeStateUpper && len(word) == 1)
+		breakWord = breakWord && (state == runeStateNumber || state != runeType)
 
-			continue
+		if breakWord {
+			writeWord()
 		}
 
-		next()
+		addToWord(r, runeType)
 	}
 
-	next()
-
-	if parts[len(parts)-1] == "" {
-		parts = parts[:len(parts)-1]
+	if len(word) > 0 {
+		writeWord()
 	}
 
-	return parts
+	return words
 }
 
-func partsToCapitalized(parts []string, firstLower bool) string {
+func wordsToCapitalized(parts []string, firstLower bool) string {
 	res := ""
 
 	start := 0
@@ -76,7 +104,7 @@ func partsToCapitalized(parts []string, firstLower bool) string {
 	return res
 }
 
-func partsToIdentifier(parts []string) string {
+func wordsToIdentifier(parts []string) string {
 	return strings.Join(parts, "-")
 }
 

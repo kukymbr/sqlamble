@@ -207,19 +207,19 @@ func (g *Generator) initIdentifiers(
 ) {
 	packageName := g.opt.PackageName
 
-	parts := nameToParts(name)
+	parts := nameToWords(name)
 	if len(parts) == 0 {
-		parts = nameToParts(packageName)
+		parts = nameToWords(packageName)
 	}
 
-	data.Identifier = partsToIdentifier(parts)
-	data.PublicSlug = partsToCapitalized(parts, false)
+	data.Identifier = wordsToIdentifier(parts)
+	data.PublicSlug = wordsToCapitalized(parts, false)
 	data.PrefixedPublicSlug = data.PublicSlug
 
 	if parent != nil && (!parent.IsRoot || parent.Identifier == data.Identifier) {
-		if prefixParts := nameToParts(parent.Identifier); len(prefixParts) > 0 {
-			data.Identifier = partsToIdentifier(prefixParts) + "-" + data.Identifier
-			data.PrefixedPublicSlug = partsToCapitalized(prefixParts, false) + data.PrefixedPublicSlug
+		if prefixParts := nameToWords(parent.Identifier); len(prefixParts) > 0 {
+			data.Identifier = wordsToIdentifier(prefixParts) + "-" + data.Identifier
+			data.PrefixedPublicSlug = wordsToCapitalized(prefixParts, false) + data.PrefixedPublicSlug
 		}
 	}
 
