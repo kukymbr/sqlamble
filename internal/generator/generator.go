@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"text/template"
 
 	"github.com/kukymbr/sqlamble/internal/formatter"
 	"github.com/kukymbr/sqlamble/internal/generator/templates"
@@ -32,14 +31,12 @@ func New(opt Options) (*Generator, error) {
 	return &Generator{
 		opt:       opt,
 		formatter: f,
-		template:  templates.ParseEmbeddedTemplates(),
 	}, nil
 }
 
 type Generator struct {
 	opt       Options
 	formatter formatter.Formatter
-	template  *template.Template
 }
 
 func (g *Generator) Generate(ctx context.Context) error {
@@ -53,11 +50,8 @@ func (g *Generator) Generate(ctx context.Context) error {
 
 		utils.PrintDebugf("Writing %s...", dir.TargetPath)
 
-		if err := g.template.ExecuteTemplate(fc, templates.TemplateNameDir, dir); err != nil {
-			return fmt.Errorf(
-				"failed to execute template %s for %s query: %w",
-				templates.TemplateNameDir, dir.SourcePath, err,
-			)
+		if err := templates.ExecuteDirTemplate(fc, dir); err != nil {
+			return fmt.Errorf("%s: %w", dir.SourcePath, err)
 		}
 
 		if err := utils.WriteFile(fc, dir.TargetPath); err != nil {
