@@ -128,7 +128,7 @@ Just moving the SQL code away.
 
 ## Contributing
 
-Please, refer the [CONTRIBUTING.md](CONTRIBUTING.md) doc.
+Please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) doc.
 
 ## License
 

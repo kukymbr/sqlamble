@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/kukymbr/sqlamble/internal/formatter"
@@ -11,6 +12,7 @@ const (
 	DefaultPackageName          = "queries"
 	DefaultSourceDir            = "."
 	DefaultTargetDir            = "internal/" + DefaultPackageName
+	DefaultFormatter            = formatter.GoFmt
 	DefaultSourceFilesExtension = ".sql"
 	DefaultQueryGetterSuffix    = "Query"
 )
@@ -21,7 +23,7 @@ type Options struct {
 	PackageName string
 
 	// SourceDir is a directory of the SQL files.
-	// Default is current directory (most applicable for go:generate).
+	// Default is the current directory (most applicable for go:generate).
 	SourceDir string
 
 	// TargetDir is a target go code directory.
@@ -43,16 +45,7 @@ type Options struct {
 }
 
 func (opt Options) Debug() string {
-	values := []string{
-		"package_name" + "=" + opt.PackageName,
-		"source_dir" + "=" + opt.SourceDir,
-		"target_dir" + "=" + opt.TargetDir,
-		"source_files_ext" + "=" + strings.Join(opt.SourceFilesExt, ","),
-		"formatter" + "=" + opt.Formatter,
-		"query_getter_suffix" + "=" + opt.QueryGetterSuffix,
-	}
-
-	return strings.Join(values, "; ")
+	return fmt.Sprintf("%#v", opt)
 }
 
 func prepareOptions(opt *Options) error {
@@ -72,7 +65,7 @@ func prepareOptions(opt *Options) error {
 	}
 
 	if opt.Formatter == "" {
-		opt.Formatter = formatter.DefaultFormatter
+		opt.Formatter = DefaultFormatter
 	}
 
 	if opt.QueryGetterSuffix == "" {

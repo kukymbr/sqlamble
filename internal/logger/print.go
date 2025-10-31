@@ -1,4 +1,4 @@
-package utils
+package logger
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ func SetSilentMode(silent bool) {
 	silentMode = silent
 }
 
-func PrintHellof(format string, args ...any) {
+func Hellof(format string, args ...any) {
 	if silentMode {
 		return
 	}
@@ -19,7 +19,7 @@ func PrintHellof(format string, args ...any) {
 	fmt.Printf("👋 "+format+"\n", args...)
 }
 
-func PrintDebugf(format string, args ...any) {
+func Debugf(format string, args ...any) {
 	if silentMode {
 		return
 	}
@@ -27,7 +27,7 @@ func PrintDebugf(format string, args ...any) {
 	fmt.Printf("⚙️ "+format+"\n", args...)
 }
 
-func PrintWarningf(format string, args ...any) {
+func Warningf(format string, args ...any) {
 	if silentMode {
 		return
 	}
@@ -39,7 +39,7 @@ func PrintWarningf(format string, args ...any) {
 	}
 }
 
-func PrintErrorf(format string, args ...any) {
+func Errorf(format string, args ...any) {
 	message := "🚫 ERROR: " + fmt.Sprintf(format, args...) + "\n"
 
 	if _, err := fmt.Fprint(os.Stderr, message); err != nil {
@@ -47,7 +47,7 @@ func PrintErrorf(format string, args ...any) {
 	}
 }
 
-func PrintSuccessf(format string, args ...any) {
+func Successf(format string, args ...any) {
 	if silentMode {
 		return
 	}

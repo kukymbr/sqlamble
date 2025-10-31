@@ -11,6 +11,7 @@ import (
 	"github.com/kukymbr/sqlamble/internal/formatter"
 	"github.com/kukymbr/sqlamble/internal/generator/templates"
 	"github.com/kukymbr/sqlamble/internal/generator/types"
+	"github.com/kukymbr/sqlamble/internal/logger"
 	"github.com/kukymbr/sqlamble/internal/utils"
 	"github.com/kukymbr/sqlamble/internal/version"
 )
@@ -25,8 +26,8 @@ func New(opt Options) (*Generator, error) {
 		return nil, err
 	}
 
-	utils.PrintHellof("Hi, this is sqlamble generator.")
-	utils.PrintDebugf("Options: " + opt.Debug())
+	logger.Hellof("Hi, this is sqlamble generator.")
+	logger.Debugf("Options: " + opt.Debug())
 
 	return &Generator{
 		opt:       opt,
@@ -48,20 +49,20 @@ func (g *Generator) Generate(ctx context.Context) error {
 	for _, dir := range dirs {
 		fc := &strings.Builder{}
 
-		utils.PrintDebugf("Writing %s...", dir.TargetPath)
+		logger.Debugf("Writing %s...", dir.TargetPath)
 
 		if err := templates.ExecuteDirTemplate(fc, dir); err != nil {
 			return fmt.Errorf("%s: %w", dir.SourcePath, err)
 		}
 
-		if err := utils.WriteFile(fc, dir.TargetPath); err != nil {
+		content := g.format(ctx, []byte(fc.String()))
+
+		if err := utils.WriteFile(content, dir.TargetPath); err != nil {
 			return err
 		}
 	}
 
-	g.format(ctx)
-
-	utils.PrintSuccessf("All done.")
+	logger.Successf("All done.")
 
 	return nil
 }
@@ -76,7 +77,7 @@ func (g *Generator) scanDir(
 	[]*types.Directory,
 	error,
 ) {
-	utils.PrintDebugf("Scanning dir: %s...", rootPath)
+	logger.Debugf("Scanning dir: %s...", rootPath)
 
 	name := ""
 	if rootPath == g.opt.SourceDir {
@@ -223,10 +224,15 @@ func (g *Generator) initIdentifiers(
 	data.PrivateSlug = firstLower(data.PublicSlug)
 }
 
-func (g *Generator) format(ctx context.Context) {
-	utils.PrintDebugf("Formatting %s...", g.opt.TargetDir)
+func (g *Generator) format(ctx context.Context, content []byte) []byte {
+	logger.Debugf("Formatting generated code...")
 
-	if err := g.formatter.Format(ctx, g.opt.TargetDir); err != nil {
-		utils.PrintWarningf("Failed to format generated code: %s", err.Error())
+	formatted, err := g.formatter.Format(ctx, content)
+	if err != nil {
+		logger.Warningf("Failed to format generated code: %s", err.Error())
+
+		return content
 	}
+
+	return formatted
 }

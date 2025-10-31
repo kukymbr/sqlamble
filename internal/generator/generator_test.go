@@ -202,7 +202,7 @@ func (s *GeneratorSuite) runGeneratorGenerateTest(test generatorGenerateTestCase
 		return
 	}
 
-	ctx := context.Background()
+	ctx := s.T().Context()
 	if test.GetContextFunc != nil {
 		ctx = test.GetContextFunc()
 	}

@@ -8,14 +8,14 @@ import (
 
 	"github.com/kukymbr/sqlamble/internal/formatter"
 	"github.com/kukymbr/sqlamble/internal/generator"
-	"github.com/kukymbr/sqlamble/internal/utils"
+	"github.com/kukymbr/sqlamble/internal/logger"
 	"github.com/kukymbr/sqlamble/internal/version"
 	"github.com/spf13/cobra"
 )
 
 func Run() {
 	if err := run(); err != nil {
-		utils.PrintErrorf("%s", err.Error())
+		logger.Errorf("%s", err.Error())
 		os.Exit(1)
 	}
 
@@ -48,7 +48,7 @@ See https://github.com/kukymbr/sqlamble for info.`,
 	initFlags(cmd, &opt, &silent)
 
 	cmd.PersistentPreRun = func(_ *cobra.Command, _ []string) {
-		utils.SetSilentMode(silent)
+		logger.SetSilentMode(silent)
 	}
 
 	return cmd.Execute()
@@ -88,8 +88,8 @@ func initFlags(cmd *cobra.Command, opt *generator.Options, silent *bool) {
 	cmd.Flags().StringVar(
 		&opt.Formatter,
 		"fmt",
-		formatter.DefaultFormatter,
-		"Formatter used to format generated go files (gofmt|noop)",
+		generator.DefaultFormatter,
+		"Formatter used to format generated go files ("+formatter.GoFmt+"|"+formatter.Noop+")",
 	)
 
 	cmd.Flags().StringVar(

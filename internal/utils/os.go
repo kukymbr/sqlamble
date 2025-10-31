@@ -5,7 +5,18 @@ import (
 	"os"
 )
 
-const dirsMode os.FileMode = 0755
+const (
+	filesMode os.FileMode = 0644
+	dirsMode  os.FileMode = 0755
+)
+
+func WriteFile(content []byte, target string) error {
+	if err := os.WriteFile(target, content, filesMode); err != nil {
+		return fmt.Errorf("failed to write file %s: %w", target, err)
+	}
+
+	return nil
+}
 
 // ValidateIsDir checks if path exists and is a directory.
 func ValidateIsDir(path string) error {

@@ -1,38 +1,16 @@
 package formatter
 
 import (
-	"bytes"
 	"context"
-	"fmt"
-	"os/exec"
-	"path/filepath"
+	"go/format"
 )
 
-func NewGoFmtFormatter() Formatter {
-	return &goFmt{
-		executable: "go",
-	}
+func NewGoFmt() Formatter {
+	return &goFmt{}
 }
 
-type goFmt struct {
-	executable string
-}
+type goFmt struct{}
 
-func (f *goFmt) Format(ctx context.Context, dirPath string) error {
-	var errOut bytes.Buffer
-
-	path, err := filepath.Abs(dirPath)
-	if err != nil {
-		return fmt.Errorf("failed to resolve absolute path for %s: %w", dirPath, err)
-	}
-
-	//nolint:gosec
-	cmd := exec.CommandContext(ctx, f.executable, "fmt", path+"/...")
-	cmd.Stderr = &errOut
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to run gofmt: %w (output: %s)", err, errOut.String())
-	}
-
-	return nil
+func (f *goFmt) Format(_ context.Context, content []byte) ([]byte, error) {
+	return format.Source(content)
 }
